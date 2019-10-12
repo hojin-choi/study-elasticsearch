@@ -1,0 +1,35 @@
+version: "3"
+
+networks:
+  network:
+
+services:
+  elasticsearch:
+    image: elasticsearch:7.1.1
+    container_name: study-elasticsearch
+    networks:
+      - network
+    ports:
+      - 9200:9200
+      - 9300:9300
+    # environment:
+    #   - discovery.type=single-node
+    volumes:
+      - ./data/elasticsearch:/usr/share/elasticsearch/data
+      - ./config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./sample-data/agg_example:/es/book_backup/agg_example
+      - ./sample-data/search_example:/es/book_backup/search_example
+
+  kibana:
+    image: kibana:7.1.1
+    container_name: study-kibana
+    networks:
+      - network
+    ports:
+      - 5601:5601
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    links:
+      - elasticsearch
+    depends_on:
+      - elasticsearch
